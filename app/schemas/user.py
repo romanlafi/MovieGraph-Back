@@ -33,3 +33,12 @@ class UserResponse(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
+
+def user_node_to_response(node) -> UserResponse:
+    return UserResponse(
+        username=node["username"],
+        email=node["email"],
+        birthdate=node["birthdate"],
+        bio=node.get("bio", ""),
+        favorite_genres=node.get("favorite_genres", [])
+    )
