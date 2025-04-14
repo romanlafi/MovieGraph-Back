@@ -3,10 +3,10 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 from starlette import status
 
-from app.core.config import SECRET_KEY
+from app.core.config import SECRET_KEY, JWT_ALGORITHM
 from app.graph.queries.user import get_user_by_email
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/users/login")
 
 def get_current_user(token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(

@@ -4,6 +4,7 @@ neo4j
 pydantic[email]
 passlib
 python-jose
+python-multipart
 starlette
 uvicorn
 bcrypt

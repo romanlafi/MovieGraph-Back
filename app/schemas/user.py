@@ -1,6 +1,7 @@
 from datetime import date
 from typing import Optional
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, field_validator
+import neo4j.time
 
 
 class UserCreate(BaseModel):
@@ -21,6 +22,13 @@ class UserResponse(BaseModel):
     birthdate: date
     bio: Optional[str]
     favorite_genres: Optional[list[str]]
+
+    @field_validator("birthdate", mode="before")
+    @classmethod
+    def convert_neo4j_date(cls, value):
+        if isinstance(value, neo4j.time.Date):
+            return date.fromisoformat(str(value))
+        return value
 
 class Token(BaseModel):
     access_token: str
