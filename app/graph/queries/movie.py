@@ -1,10 +1,20 @@
 from app.graph.driver import get_driver
 
-def create_movie_node(title: str, year: int = None, genres: list[str] = None,
-                      imdb_id: str = None, poster_url: str = None,
-                      rated: str = None, released: str = None, runtime: str = None,
-                      director: str = None, box_office: str = None,
-                      production: str = None, website: str = None, type: str = None):
+def create_movie_node(
+        title: str,
+        year: int = None,
+        genres: list[str] = None,
+        imdb_id: str = None,
+        poster_url: str = None,
+        rated: str = None,
+        released: str = None,
+        runtime: str = None,
+        director: str = None,
+        box_office: str = None,
+        production: str = None,
+        website: str = None,
+        type: str = None
+):
 
     query = """
     CREATE (m:Movie {

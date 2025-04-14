@@ -14,12 +14,12 @@ def register_user(user: UserCreate) -> UserResponse:
     hashed_pw = hash_password(user.password)
 
     node = create_user_node(
-        username=user.username,
-        email=str(user.email),
-        password=hashed_pw,
-        birthdate=user.birthdate,
-        bio=user.bio,
-        favorite_genres=user.favorite_genres
+        username = user.username,
+        email = str(user.email),
+        password = hashed_pw,
+        birthdate = user.birthdate,
+        bio = user.bio,
+        favorite_genres = user.favorite_genres
     )
     return format_user_node(node)
 

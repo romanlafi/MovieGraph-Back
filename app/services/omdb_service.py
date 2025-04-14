@@ -24,6 +24,7 @@ def fetch_movie_data(title: str) -> dict | None:
                 "released": data.get("Released"),
                 "runtime": data.get("Runtime"),
                 "director": data.get("Director"),
+                "actors": data.get("Actors", "").split(", "),
                 "box_office": data.get("BoxOffice"),
                 "production": data.get("Production"),
                 "website": data.get("Website"),
