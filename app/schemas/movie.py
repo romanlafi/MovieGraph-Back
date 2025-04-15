@@ -24,7 +24,7 @@ class MovieResponse(MovieBase):
     id: str
 
 class MovieListResponse(BaseModel):
-    id: str
+    imdb_id: str
     title: str
     poster_url: Optional[str] = None
     year: Optional[int] = None
@@ -52,7 +52,7 @@ def movie_node_to_response(node) -> MovieResponse:
 
 def movie_node_to_list_response(node) -> MovieListResponse:
     return MovieListResponse(
-        id=str(node["id"]),
+        imdb_id=node.get("imdb_id"),
         title=node["title"],
         poster_url=node.get("poster_url"),
         year=node.get("year"),

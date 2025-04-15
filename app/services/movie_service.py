@@ -1,4 +1,5 @@
-from app.graph.queries.movie import get_movie_by_title, create_movie_node, search_movies_in_neo4j, get_movie_by_imdb_id
+from app.graph.queries.movie import get_movie_by_title, create_movie_node, search_movies_in_neo4j, get_movie_by_imdb_id, \
+    like_movie_by_imdb_id, unlike_movie_by_imdb_id, get_liked_movies
 from app.graph.queries.person import get_or_create_person, create_relationship
 from app.schemas.movie import movie_node_to_list_response, MovieListResponse
 from app.services.omdb_service import search_movies_omdb, fetch_movie_data_by_imdb
@@ -76,5 +77,12 @@ def register_movie_from_data(data: dict):
 
     return movie
 
+def like_movie_by_imdb(user_email: str, movie_id: str):
+    like_movie_by_imdb_id(user_email, movie_id)
 
+def unlike_movie_by_imdb(user_email: str, movie_id: str):
+    unlike_movie_by_imdb_id(user_email, movie_id)
 
+def get_movies_liked_by_user(user_email: str) -> list[MovieListResponse]:
+    nodes = get_liked_movies(user_email)
+    return [movie_node_to_list_response(n) for n in nodes]

@@ -57,3 +57,31 @@ def get_movie_by_title(title: str):
         result = session.run(query, {"title": title})
         record = result.single()
         return record["m"] if record else None
+
+def like_movie_by_imdb_id(user_email: str, imdb_id: str):
+    query = '''
+        MATCH (u:User {email: $email}), (m:Movie {imdb_id: $imdb_id})
+        MERGE (u)-[:LIKES]->(m)
+        '''
+    driver = get_driver()
+    with driver.session() as session:
+        session.run(query, {"email": user_email, "imdb_id": imdb_id})
+
+def unlike_movie_by_imdb_id(user_email: str, imdb_id: str):
+    query = '''
+        MATCH (u:User {email: $email})-[l:LIKES]->(m:Movie {imdb_id: $imdb_id})
+        DELETE l
+        '''
+    driver = get_driver()
+    with driver.session() as session:
+        session.run(query, {"email": user_email, "imdb_id": imdb_id})
+
+def get_liked_movies(user_email: str):
+    query = '''
+    MATCH (u:User {email: $email})-[:LIKES]->(m:Movie)
+    RETURN m
+    '''
+    driver = get_driver()
+    with driver.session() as session:
+        result = session.run(query, {"email": user_email})
+        return [record["m"] for record in result]
