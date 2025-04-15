@@ -39,6 +39,7 @@ def fetch_movie_data_by_imdb(imdb_id: str) -> dict | None:
         "runtime": data.get("Runtime"),
         "director": data.get("Director"),
         "actors": data.get("Actors", "").split(", "),
+        "imdb_rating": parse_imdb_rating(data.get("Ratings", [])),
         "box_office": data.get("BoxOffice"),
         "production": data.get("Production"),
         "website": data.get("Website"),
@@ -53,3 +54,12 @@ def clean_year(raw: str) -> int | None:
         return int(clean) if clean.isdigit() else None
     except Exception:
         return None
+
+def parse_imdb_rating(ratings: list[dict]) -> float | None:
+    for rating in ratings:
+        if rating.get("Source") == "Internet Movie Database":
+            try:
+                return float(rating["Value"].split("/")[0])
+            except:
+                return None
+    return None

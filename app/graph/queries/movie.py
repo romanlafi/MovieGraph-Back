@@ -10,6 +10,7 @@ def create_movie_node(**data):
         poster_url: $poster_url,
         rated: $rated,
         released: $released,
+        imdb_rating: $imdb_rating,
         runtime: $runtime,
         director: $director,
         box_office: $box_office,
