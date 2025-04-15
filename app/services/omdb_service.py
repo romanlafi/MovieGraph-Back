@@ -7,27 +7,49 @@ from dotenv import load_dotenv
 load_dotenv()
 
 OMDB_API_KEY = os.getenv("OMDB_API_KEY")
+BASE_URL = os.getenv("OMDB_BASE_URL")
 
-def fetch_movie_data(title: str) -> dict | None:
-    url = f"http://www.omdbapi.com/?apikey={OMDB_API_KEY}&t={title}"
-    response = httpx.get(url)
-    if response.status_code == HTTPStatus.OK:
-        data = response.json()
-        if data.get("Response") == "True":
-            return {
-                "title": data.get("Title"),
-                "year": int(data.get("Year")) if data.get("Year") else None,
-                "genres": data.get("Genre", "").split(", "),
-                "imdb_id": data.get("imdbID"),
-                "poster_url": data.get("Poster"),
-                "rated": data.get("Rated"),
-                "released": data.get("Released"),
-                "runtime": data.get("Runtime"),
-                "director": data.get("Director"),
-                "actors": data.get("Actors", "").split(", "),
-                "box_office": data.get("BoxOffice"),
-                "production": data.get("Production"),
-                "website": data.get("Website"),
-                "type": data.get("Type")
-            }
-    return None
+def call_omdb(params: dict) -> dict | None:
+    params["apikey"] = OMDB_API_KEY
+    response = httpx.get(BASE_URL, params=params)
+
+    if response.status_code != HTTPStatus.OK:
+        return None
+
+    data = response.json()
+    return data if data.get("Response") == "True" else None
+
+def search_movies_omdb(query: str, page: int = 1) -> list[dict]:
+    data = call_omdb({"s": query, "page": page})
+    return data.get("Search", []) if data else []
+
+def fetch_movie_data_by_imdb(imdb_id: str) -> dict | None:
+    data = call_omdb({"i": imdb_id})
+    if not data:
+        return None
+
+    return {
+        "title": data.get("Title"),
+        "year": clean_year(data.get("Year")),
+        "genres": data.get("Genre", "").split(", "),
+        "imdb_id": data.get("imdbID"),
+        "poster_url": data.get("Poster"),
+        "rated": data.get("Rated"),
+        "released": data.get("Released"),
+        "runtime": data.get("Runtime"),
+        "director": data.get("Director"),
+        "actors": data.get("Actors", "").split(", "),
+        "box_office": data.get("BoxOffice"),
+        "production": data.get("Production"),
+        "website": data.get("Website"),
+        "type": data.get("Type")
+    }
+
+def clean_year(raw: str) -> int | None:
+    if not raw:
+        return None
+    try:
+        clean = raw.strip().split("–")[0].split("-")[0]
+        return int(clean) if clean.isdigit() else None
+    except Exception:
+        return None
