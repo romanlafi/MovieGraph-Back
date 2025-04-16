@@ -1,8 +1,12 @@
 import uuid
+from typing import Optional
+
+from neo4j.graph import Node
+
 from app.graph.driver import get_driver
 
 
-def create_person(name: str) -> dict:
+def create_person(name: str) -> Optional[Node]:
     existing = get_person_by_name(name)
     if existing:
         return existing
@@ -21,7 +25,7 @@ def create_person(name: str) -> dict:
         record = result.single()
         return record["p"] if record else None
 
-def get_person_by_id(person_id: str) -> dict:
+def get_person_by_id(person_id: str) -> Optional[Node]:
     query = """
         MATCH (p:Person {person_id: $person_id})
         RETURN p
@@ -32,7 +36,7 @@ def get_person_by_id(person_id: str) -> dict:
         record = result.single()
         return record["p"] if record else None
 
-def get_person_by_name(name: str) -> dict | None:
+def get_person_by_name(name: str) -> Optional[Node]:
     query = "MATCH (p:Person {name: $name}) RETURN p LIMIT 1"
     driver = get_driver()
     with driver.session() as session:
@@ -40,7 +44,11 @@ def get_person_by_name(name: str) -> dict | None:
         record = result.single()
         return record["p"] if record else None
 
-def create_relationship(person_name: str, movie_title: str, relation: str):
+def create_relationship(
+        person_name: str,
+        movie_title: str,
+        relation: str
+) -> None:
     query = f"""
         MATCH (p:Person {{name: $person_name}})
         MATCH (m:Movie {{title: $movie_title}})
@@ -56,7 +64,7 @@ def create_relationship(person_name: str, movie_title: str, relation: str):
             movie_title=movie_title,
             relation=relation)
 
-def search_people_by_name(name: str) -> list[dict]:
+def search_people_by_name(name: str) -> list[Node]:
     query = '''
     MATCH (p:Person)
     WHERE toLower(p.name) CONTAINS toLower($query)
@@ -68,7 +76,7 @@ def search_people_by_name(name: str) -> list[dict]:
         result = session.run(query, {"query": name})
         return [record["p"] for record in result]
 
-def get_filmography_by_person_id(person_id: str) -> list[dict]:
+def get_filmography_by_person_id(person_id: str) -> list[Node]:
     query = '''
     MATCH (p:Person {person_id: $person_id})-[:ACTED_IN|DIRECTED]->(m:Movie)
     RETURN DISTINCT m
@@ -79,7 +87,7 @@ def get_filmography_by_person_id(person_id: str) -> list[dict]:
         result = session.run(query, {"person_id": person_id})
         return [record["m"] for record in result]
 
-def get_movies_acted_by(person_id: str) -> list[dict]:
+def get_movies_acted_by(person_id: str) -> list[Node]:
     query = """
     MATCH (p:Person {person_id: $person_id})-[:ACTED_IN]->(m:Movie)
     RETURN m
@@ -89,7 +97,7 @@ def get_movies_acted_by(person_id: str) -> list[dict]:
         result = session.run(query, {"person_id": person_id})
         return [record["m"] for record in result]
 
-def get_movies_directed_by(person_id: str) -> list[dict]:
+def get_movies_directed_by(person_id: str) -> list[Node]:
     query = """
     MATCH (p:Person {person_id: $person_id})-[:DIRECTED]->(m:Movie)
     RETURN m

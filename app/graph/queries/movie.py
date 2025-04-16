@@ -1,6 +1,10 @@
+from typing import Optional, List
+
+from neo4j.graph import Node
+
 from app.graph.driver import get_driver
 
-def create_movie_node(**data):
+def create_movie_node(**data) -> Optional[Node]:
     query = """
     CREATE (m:Movie {
         title: $title,
@@ -27,7 +31,11 @@ def create_movie_node(**data):
         record = result.single()
         return record["m"] if record else None
 
-def search_movies_in_neo4j(query: str, skip: int, limit: int):
+def search_movies_in_neo4j(
+        query: str,
+        skip: int,
+        limit: int
+) -> List[Node]:
     query_cypher = """
     MATCH (m:Movie)
     WHERE toLower(m.title) CONTAINS toLower($query)
@@ -40,66 +48,11 @@ def search_movies_in_neo4j(query: str, skip: int, limit: int):
         result = session.run(query_cypher, {"query": query, "skip": skip, "limit": limit})
         return [record["m"] for record in result]
 
-def get_movie_by_imdb_id(imdb_id: str):
-    query = """
-    MATCH (m:Movie {imdb_id: $imdb_id})
-    RETURN m
-    """
-    driver = get_driver()
-    with driver.session() as session:
-        result = session.run(query, {"imdb_id": imdb_id})
-        record = result.single()
-        return record["m"] if record else None
-
-def get_movie_by_title(title: str):
-    query = "MATCH (m:Movie {title: $title}) RETURN m LIMIT 1"
-    driver = get_driver()
-    with driver.session() as session:
-        result = session.run(query, {"title": title})
-        record = result.single()
-        return record["m"] if record else None
-
-def like_movie_by_imdb_id(user_email: str, imdb_id: str):
-    query = '''
-        MATCH (u:User {email: $email}), (m:Movie {imdb_id: $imdb_id})
-        MERGE (u)-[:LIKES]->(m)
-        '''
-    driver = get_driver()
-    with driver.session() as session:
-        session.run(query, {"email": user_email, "imdb_id": imdb_id})
-
-def unlike_movie_by_imdb_id(user_email: str, imdb_id: str):
-    query = '''
-        MATCH (u:User {email: $email})-[l:LIKES]->(m:Movie {imdb_id: $imdb_id})
-        DELETE l
-        '''
-    driver = get_driver()
-    with driver.session() as session:
-        session.run(query, {"email": user_email, "imdb_id": imdb_id})
-
-def get_liked_movies(user_email: str):
-    query = '''
-    MATCH (u:User {email: $email})-[:LIKES]->(m:Movie)
-    RETURN m
-    '''
-    driver = get_driver()
-    with driver.session() as session:
-        result = session.run(query, {"email": user_email})
-        return [record["m"] for record in result]
-
-def get_all_genres():
-    query = '''
-        MATCH (m:Movie)
-        UNWIND m.genres AS genre
-        RETURN DISTINCT genre
-        ORDER BY genre
-        '''
-    driver = get_driver()
-    with driver.session() as session:
-        result = session.run(query)
-        return [record["genre"] for record in result]
-
-def search_movies_by_genre(genre: str, skip: int = 0, limit: int = 10):
+def search_movies_by_genre(
+        genre: str,
+        skip: int = 0,
+        limit: int = 10
+) -> List[Node]:
     query = """
     MATCH (m:Movie)
     WHERE $genre IN m.genres
@@ -111,3 +64,63 @@ def search_movies_by_genre(genre: str, skip: int = 0, limit: int = 10):
     with get_driver().session() as session:
         result = session.run(query, {"genre": genre, "skip": skip, "limit": limit})
         return [record["m"] for record in result]
+
+def get_movie_by_imdb_id(imdb_id: str) -> Optional[Node]:
+    query = """
+    MATCH (m:Movie {imdb_id: $imdb_id})
+    RETURN m
+    """
+    driver = get_driver()
+    with driver.session() as session:
+        result = session.run(query, {"imdb_id": imdb_id})
+        record = result.single()
+        return record["m"] if record else None
+
+def get_movie_by_title(title: str) -> Optional[Node]:
+    query = "MATCH (m:Movie {title: $title}) RETURN m LIMIT 1"
+    driver = get_driver()
+    with driver.session() as session:
+        result = session.run(query, {"title": title})
+        record = result.single()
+        return record["m"] if record else None
+
+def like_movie_by_imdb_id(user_email: str, imdb_id: str) -> None:
+    query = '''
+        MATCH (u:User {email: $email}), (m:Movie {imdb_id: $imdb_id})
+        MERGE (u)-[:LIKES]->(m)
+        '''
+    driver = get_driver()
+    with driver.session() as session:
+        session.run(query, {"email": user_email, "imdb_id": imdb_id})
+
+def unlike_movie_by_imdb_id(user_email: str, imdb_id: str) -> None:
+    query = '''
+        MATCH (u:User {email: $email})-[l:LIKES]->(m:Movie {imdb_id: $imdb_id})
+        DELETE l
+        '''
+    driver = get_driver()
+    with driver.session() as session:
+        session.run(query, {"email": user_email, "imdb_id": imdb_id})
+
+def get_liked_movies(user_email: str) -> List[Node]:
+    query = '''
+    MATCH (u:User {email: $email})-[:LIKES]->(m:Movie)
+    RETURN m
+    '''
+    driver = get_driver()
+    with driver.session() as session:
+        result = session.run(query, {"email": user_email})
+        return [record["m"] for record in result]
+
+def get_all_genres() -> List[str]:
+    query = '''
+        MATCH (m:Movie)
+        UNWIND m.genres AS genre
+        RETURN DISTINCT genre
+        ORDER BY genre
+        '''
+    driver = get_driver()
+    with driver.session() as session:
+        result = session.run(query)
+        return [record["genre"] for record in result]
+

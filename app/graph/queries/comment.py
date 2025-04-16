@@ -1,9 +1,11 @@
+from typing import List
+
 from app.graph.driver import get_driver
 from datetime import datetime
 import uuid
 
 
-def add_comment(movie_id: str, user_email: str, text: str):
+def add_comment(movie_id: str, user_email: str, text: str) -> None:
     query = """
     MATCH (m:Movie {imdb_id: $movie_id})
     MERGE (u:User {email: $user_email})
@@ -22,7 +24,7 @@ def add_comment(movie_id: str, user_email: str, text: str):
             "created_at": datetime.utcnow().isoformat()
         })
 
-def get_comments(movie_id: str):
+def get_comments(movie_id: str) -> List[dict]:
     query = """
     MATCH (u:User)-[r:WROTE]->(m:Movie {imdb_id: $imdb_id})
     RETURN r.comment_id AS comment_id, u.username AS username, r.text AS text, r.created_at AS created_at
