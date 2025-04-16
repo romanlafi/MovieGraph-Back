@@ -5,7 +5,9 @@ from app.schemas.person import PersonResponse
 from app.services.person_service import (
     search_people,
     get_person_detail,
-    get_person_filmography
+    get_person_filmography,
+    get_filmography_as_actor,
+    get_filmography_as_director
 )
 
 router = APIRouter(prefix="/people", tags=["People"])
@@ -21,3 +23,11 @@ def get_person(person_id: str = Query(...)):
 @router.get("/filmography", response_model=list[MovieListResponse])
 def get_filmography(person_id: str = Query(...)):
     return get_person_filmography(person_id)
+
+@router.get("/acted", response_model=list[MovieListResponse])
+def acted_movies(person_id: str = Query(...)):
+    return get_filmography_as_actor(person_id)
+
+@router.get("/directed", response_model=list[MovieListResponse])
+def directed_movies(person_id: str = Query(...)):
+    return get_filmography_as_director(person_id)

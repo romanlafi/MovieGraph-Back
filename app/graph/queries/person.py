@@ -71,10 +71,30 @@ def search_people_by_name(name: str) -> list[dict]:
 def get_filmography_by_person_id(person_id: str) -> list[dict]:
     query = '''
     MATCH (p:Person {person_id: $person_id})-[:ACTED_IN|DIRECTED]->(m:Movie)
-    RETURN m
+    RETURN DISTINCT m
     ORDER BY m.year DESC
     '''
     driver = get_driver()
     with driver.session() as session:
+        result = session.run(query, {"person_id": person_id})
+        return [record["m"] for record in result]
+
+def get_movies_acted_by(person_id: str) -> list[dict]:
+    query = """
+    MATCH (p:Person {person_id: $person_id})-[:ACTED_IN]->(m:Movie)
+    RETURN m
+    ORDER BY m.year DESC
+    """
+    with get_driver().session() as session:
+        result = session.run(query, {"person_id": person_id})
+        return [record["m"] for record in result]
+
+def get_movies_directed_by(person_id: str) -> list[dict]:
+    query = """
+    MATCH (p:Person {person_id: $person_id})-[:DIRECTED]->(m:Movie)
+    RETURN m
+    ORDER BY m.year DESC
+    """
+    with get_driver().session() as session:
         result = session.run(query, {"person_id": person_id})
         return [record["m"] for record in result]
