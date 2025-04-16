@@ -1,4 +1,4 @@
-from datetime import timedelta, date
+from datetime import timedelta
 
 from app.core.config import ACCESS_TOKEN_EXPIRE_MINUTES
 from app.core.security import hash_password, verify_password, create_access_token

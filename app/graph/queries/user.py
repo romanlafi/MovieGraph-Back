@@ -2,7 +2,16 @@ from datetime import date
 from app.graph.driver import get_driver
 
 
-def create_user_node(username: str, email: str, password: str, birthdate: date, bio: str = "", favorite_genres: list[str] = []):
+def create_user_node(
+        username: str,
+        email: str,
+        password: str,
+        birthdate: date,
+        bio: str = "",
+        favorite_genres=None
+):
+    if favorite_genres is None:
+        favorite_genres = []
     query = """
         CREATE (u:User {
             username: $username,

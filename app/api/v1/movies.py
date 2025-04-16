@@ -10,7 +10,8 @@ from app.services.movie_service import (
     unlike_movie_by_imdb,
     get_movies_liked_by_user,
     list_all_genres,
-    get_movie_by_imdb
+    get_movie_by_imdb,
+    search_by_genre
 )
 
 
@@ -23,6 +24,14 @@ def search_movies_route(
     limit: int = Query(10, ge=1, le=50),
 ):
     return search_movies(query=query, page=page, limit=limit)
+
+@router.get("/by_genre", response_model=list[MovieListResponse])
+def get_movies_by_genre(
+    name: str = Query(..., min_length=2),
+    page: int = Query(1, ge=1),
+    limit: int = Query(10, le=50)
+):
+    return search_by_genre(name, page, limit)
 
 @router.get("/", response_model=MovieResponse)
 def get_movie(imdb_id: str):
@@ -46,7 +55,7 @@ def unlike_movie(
 def get_liked_movies(current_user=Depends(get_current_user)):
     return get_movies_liked_by_user(current_user["email"])
 
-@router.post("/comment", status_code=201)
+@router.post("/comment")
 def comment_movie(
         movie_id: str = Query(...),
         comment: CommentCreate = Depends(CommentCreate),

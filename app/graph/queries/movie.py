@@ -98,3 +98,16 @@ def get_all_genres():
     with driver.session() as session:
         result = session.run(query)
         return [record["genre"] for record in result]
+
+def search_movies_by_genre(genre: str, skip: int = 0, limit: int = 10):
+    query = """
+    MATCH (m:Movie)
+    WHERE $genre IN m.genres
+    RETURN m
+    ORDER BY m.year DESC
+    SKIP $skip
+    LIMIT $limit
+    """
+    with get_driver().session() as session:
+        result = session.run(query, {"genre": genre, "skip": skip, "limit": limit})
+        return [record["m"] for record in result]

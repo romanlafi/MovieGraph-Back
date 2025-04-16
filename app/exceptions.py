@@ -22,3 +22,8 @@ class MovieNotFoundError(HTTPException):
 class PersonNotFoundError(HTTPException):
     def __init__(self):
         super().__init__(status_code=status.HTTP_404_NOT_FOUND, detail="Person not found")
+        
+
+class GenreNotFoundError(HTTPException):
+    def __init__(self):
+        super().__init__(status_code=status.HTTP_404_NOT_FOUND, detail="Genre does not exists")
