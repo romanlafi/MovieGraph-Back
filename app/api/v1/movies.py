@@ -37,14 +37,14 @@ def get_movies_by_genre(
 def get_movie(imdb_id: str):
     return get_movie_by_imdb(imdb_id)
 
-@router.post("/like", status_code=204)
+@router.post("/like", status_code=200)
 def like_movie(
         imdb_id: str = Query(...),
         current_user=Depends(get_current_user)
 ):
     like_movie_by_imdb_id(current_user["email"], imdb_id)
 
-@router.delete("/like", status_code=204)
+@router.delete("/like", status_code=200)
 def unlike_movie(
     imdb_id: str = Query(...),
     current_user=Depends(get_current_user)
