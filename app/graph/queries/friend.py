@@ -6,6 +6,7 @@ def create_friendship(from_email: str, to_email: str):
     MATCH (a:User {email: $from_email})
     MATCH (b:User {email: $to_email})
     MERGE (a)-[:FRIEND]->(b)
+    MERGE (b)-[:FRIEND]->(a)
     RETURN b
     """
     driver = get_driver()

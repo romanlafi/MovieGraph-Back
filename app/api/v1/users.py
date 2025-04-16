@@ -17,7 +17,8 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
         UserLogin(
             email=form_data.username,
             password=form_data.password
-    ))
+        )
+    )
 
 @router.get("/me", response_model=UserResponse)
 def get_my_profile(current_user=Depends(get_current_user)):
