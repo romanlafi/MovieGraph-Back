@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, Query
 
 from app.deps.auth import get_current_user
-from app.schemas.movie import MovieListResponse
+from app.schemas.movie import MovieListResponse, MovieResponse
 from app.services.movie_service import search_movies, like_movie_by_imdb_id, \
-    unlike_movie_by_imdb, get_movies_liked_by_user
+    unlike_movie_by_imdb, get_movies_liked_by_user, list_all_genres, get_movie_by_imdb
 
 router = APIRouter(prefix="/movies", tags=["Movies"])
 
@@ -15,6 +15,10 @@ def search_movies_route(
     current_user=Depends(get_current_user)
 ):
     return search_movies(query=query, page=page, limit=limit)
+
+@router.get("/", response_model=MovieResponse)
+def get_movie(imdb_id: str):
+    return get_movie_by_imdb(imdb_id)
 
 @router.post("/like", status_code=204)
 def like_movie(
@@ -30,7 +34,10 @@ def unlike_movie(
 ):
     unlike_movie_by_imdb(current_user["email"], imdb_id)
 
-
 @router.get("/like", response_model=list[MovieListResponse])
 def get_liked_movies(current_user=Depends(get_current_user)):
     return get_movies_liked_by_user(current_user["email"])
+
+@router.get("/genres", response_model=list[str])
+def get_genres():
+    return list_all_genres()

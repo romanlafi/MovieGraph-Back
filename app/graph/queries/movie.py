@@ -16,7 +16,8 @@ def create_movie_node(**data):
         box_office: $box_office,
         production: $production,
         website: $website,
-        type: $type
+        type: $type,
+        plot: $plot
     })
     RETURN m
     """
@@ -85,3 +86,15 @@ def get_liked_movies(user_email: str):
     with driver.session() as session:
         result = session.run(query, {"email": user_email})
         return [record["m"] for record in result]
+
+def get_all_genres():
+    query = '''
+        MATCH (m:Movie)
+        UNWIND m.genres AS genre
+        RETURN DISTINCT genre
+        ORDER BY genre
+        '''
+    driver = get_driver()
+    with driver.session() as session:
+        result = session.run(query)
+        return [record["genre"] for record in result]

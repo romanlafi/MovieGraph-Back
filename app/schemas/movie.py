@@ -16,6 +16,7 @@ class MovieBase(BaseModel):
     production: Optional[str] = None
     website: Optional[str] = None
     type: Optional[str] = None
+    plot: Optional[str] = None
 
 class MovieCreate(MovieBase):
     pass
@@ -47,7 +48,8 @@ def movie_node_to_response(node) -> MovieResponse:
         box_office=node.get("box_office"),
         production=node.get("production"),
         website=node.get("website"),
-        type=node.get("type")
+        type=node.get("type"),
+        plot=node.get("plot")
     )
 
 def movie_node_to_list_response(node) -> MovieListResponse:

@@ -43,7 +43,8 @@ def fetch_movie_data_by_imdb(imdb_id: str) -> dict | None:
         "box_office": data.get("BoxOffice"),
         "production": data.get("Production"),
         "website": data.get("Website"),
-        "type": data.get("Type")
+        "type": data.get("Type"),
+        "plot": data.get("Plot")
     }
 
 def clean_year(raw: str) -> int | None:
