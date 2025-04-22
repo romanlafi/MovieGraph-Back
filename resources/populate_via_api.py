@@ -29,9 +29,21 @@ friendships = [
 ]
 
 movie_pool = [
-    "The Matrix", "Inception", "Fight Club", "Pulp Fiction", "Amelie", "Her",
-    "The Godfather", "Goodfellas", "Interstellar", "The Prestige", "Whiplash",
-    "The Dark Knight", "Memento", "The Grand Budapest Hotel", "Parasite"
+    "The Matrix",
+    "Inception",
+    "Fight Club",
+    "Pulp Fiction",
+    "Amelie",
+    "Her",
+    "The Godfather",
+    "Goodfellas",
+    "Interstellar",
+    "The Prestige", 
+    "Whiplash",
+    "The Dark Knight",
+    "Memento",
+    "The Grand Budapest Hotel",
+    "Parasite"
 ]
 
 likes = {
@@ -48,8 +60,11 @@ def register_and_login_users():
             headers={"Content-Type": "application/json"},
             json=user
         )
-        if register_resp.status_code != 200:
+        if register_resp.status_code == 200:
+            print(f"Register completed {user['email']}")
+        else:
             print(f"Failed to register {user['email']}: {register_resp.text}")
+
 
         login_resp = httpx.post(f"{BASE_URL}/users/login", data={
             "username": user["email"],
@@ -57,7 +72,7 @@ def register_and_login_users():
         })
         if login_resp.status_code == 200:
             tokens[user["email"]] = login_resp.json()["access_token"]
-            print(f"Successfully loged {user['email']}: {login_resp.text}")
+            print(f"Successfully logged {user['email']}")
         else:
             print(f"Failed to login {user['email']}: {login_resp.text}")
 
@@ -65,11 +80,15 @@ def create_friendships():
     for sender, receiver in friendships:
         token = tokens.get(sender)
         if token:
-            httpx.post(
+            create_friendship_resp = httpx.post(
                 f"{BASE_URL}/friends/",
                 headers={"Authorization": f"Bearer {token}"},
                 json={"email": receiver}
             )
+            if create_friendship_resp.status_code == 200:
+                print(f"Friendship created {sender} - {receiver}")
+            else:
+                print(f"Failed to create friendship {sender} - {receiver}: {create_friendship_resp.text}")
 
 def search_and_like():
     for email, movie_titles in likes.items():
@@ -84,6 +103,7 @@ def search_and_like():
                 headers={"Authorization": f"Bearer {token}"}
             )
             if res.status_code == 200 and res.json():
+                print(f"Successfully searched movie {title}")
                 movie = res.json()[0]
                 imdb_id = movie["imdb_id"]
                 httpx.post(
@@ -96,4 +116,4 @@ if __name__ == "__main__":
     register_and_login_users()
     create_friendships()
     search_and_like()
-    print("\n✅ Poblamiento vía API completado.")
+    print("\nPoblamiento vía API completado.")
