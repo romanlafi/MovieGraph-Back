@@ -29,21 +29,29 @@ friendships = [
 ]
 
 movie_pool = [
-    "The Matrix",
-    "Inception",
-    "Fight Club",
-    "Pulp Fiction",
-    "Amelie",
-    "Her",
-    "The Godfather",
-    "Goodfellas",
-    "Interstellar",
-    "The Prestige", 
-    "Whiplash",
-    "The Dark Knight",
-    "Memento",
-    "The Grand Budapest Hotel",
-    "Parasite"
+    "The Matrix", "Inception", "Fight Club", "Pulp Fiction", "Amélie", "Her",
+    "The Godfather", "Goodfellas", "Interstellar", "The Prestige", "Whiplash",
+    "The Dark Knight", "Memento", "The Grand Budapest Hotel", "Parasite",
+    "Forrest Gump", "Gladiator", "The Lion King", "The Shawshank Redemption",
+    "The Lord of the Rings: The Fellowship of the Ring", "The Two Towers", "The Return of the King",
+    "Avatar", "Titanic", "The Social Network", "Black Swan", "Joker", "La La Land",
+    "Django Unchained", "The Hateful Eight", "The Revenant", "Blade Runner", "Blade Runner 2049",
+    "Arrival", "Ex Machina", "The Imitation Game", "The Theory of Everything",
+    "Oppenheimer", "Tenet", "The Batman", "Logan", "Deadpool", "Doctor Strange",
+    "Iron Man", "Captain America: Civil War", "Avengers: Endgame", "Infinity War",
+    "Guardians of the Galaxy", "Thor: Ragnarok", "Ant-Man", "Black Panther",
+    "Spider-Man: No Way Home", "Into the Spider-Verse", "The Flash", "Aquaman",
+    "Shazam!", "Man of Steel", "The Suicide Squad", "Wonder Woman",
+    "The Hunger Games", "Catching Fire", "Mockingjay", "Divergent", "Insurgent",
+    "Maze Runner", "The Scorch Trials", "The Death Cure", "Harry Potter and the Philosopher's Stone",
+    "Chamber of Secrets", "Prisoner of Azkaban", "Goblet of Fire", "Order of the Phoenix",
+    "Half-Blood Prince", "Deathly Hallows Part 1", "Part 2",
+    "Fantastic Beasts", "Crimes of Grindelwald", "Secrets of Dumbledore",
+    "The Fault in Our Stars", "The Perks of Being a Wallflower", "500 Days of Summer",
+    "Me Before You", "A Star Is Born", "Bohemian Rhapsody", "Rocketman",
+    "The Irishman", "Knives Out", "Glass Onion", "Everything Everywhere All at Once",
+    "No Country for Old Men", "The Big Short", "The Wolf of Wall Street",
+    "The Departed", "The Pianist", "The Grandmaster"
 ]
 
 likes = {
@@ -55,15 +63,15 @@ tokens = {}
 
 def register_and_login_users():
     for user in users:
-        register_resp = httpx.post(
-            f"{BASE_URL}/users/",
-            headers={"Content-Type": "application/json"},
-            json=user
-        )
-        if register_resp.status_code == 200:
-            print(f"Register completed {user['email']}")
-        else:
-            print(f"Failed to register {user['email']}: {register_resp.text}")
+        # register_resp = httpx.post(
+        #     f"{BASE_URL}/users/",
+        #     headers={"Content-Type": "application/json"},
+        #     json=user
+        # )
+        # if register_resp.status_code == 200:
+        #     print(f"Register completed {user['email']}")
+        # else:
+        #     print(f"Failed to register {user['email']}: {register_resp.text}")
 
 
         login_resp = httpx.post(f"{BASE_URL}/users/login", data={
@@ -114,6 +122,6 @@ def search_and_like():
 
 if __name__ == "__main__":
     register_and_login_users()
-    create_friendships()
+    # create_friendships()
     search_and_like()
     print("\nPoblamiento vía API completado.")

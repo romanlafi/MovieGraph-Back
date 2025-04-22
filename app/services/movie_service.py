@@ -49,6 +49,9 @@ def search_movies(query: str, page: int = 1, limit: int = 10) -> List[MovieListR
             if full_data.get("type") not in ("movie", "series"):
                 continue
 
+            if not full_data.get("poster_url"):
+                continue
+
             node = register_movie_from_data(full_data)
             if node:
                 responses.append(movie_node_to_list_response(node))
