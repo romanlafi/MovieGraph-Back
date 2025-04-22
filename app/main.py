@@ -13,7 +13,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# app.include_router(ping.router, prefix="/api/v1")
 app.include_router(users.router, prefix="/api/v1")
 app.include_router(friends.router, prefix="/api/v1")
 app.include_router(movies.router, prefix="/api/v1")

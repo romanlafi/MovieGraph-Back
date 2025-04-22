@@ -1,3 +1,4 @@
+from neo4j.graph import Node
 from pydantic import BaseModel
 from typing import Optional, List
 
@@ -33,7 +34,7 @@ class MovieListResponse(BaseModel):
     imdb_rating: Optional[float] = None
     type: Optional[str] = None
 
-def movie_node_to_response(node) -> MovieResponse:
+def movie_node_to_response(node: Node) -> MovieResponse:
     return MovieResponse(
         id=str(node.id),
         title=node.get("title"),
@@ -52,7 +53,7 @@ def movie_node_to_response(node) -> MovieResponse:
         plot=node.get("plot")
     )
 
-def movie_node_to_list_response(node) -> MovieListResponse:
+def movie_node_to_list_response(node: Node) -> MovieListResponse:
     return MovieListResponse(
         imdb_id=node.get("imdb_id"),
         title=node["title"],

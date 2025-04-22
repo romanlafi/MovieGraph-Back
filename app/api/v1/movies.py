@@ -19,7 +19,7 @@ from app.services.movie_service_async import search_movies_async
 
 router = APIRouter(prefix="/movies", tags=["Movies"])
 
-@router.get("/search", response_model=list[MovieListResponse])
+@router.get("/search", response_model=List[MovieListResponse])
 def search_movies_route(
     query: str = Query(..., min_length=2),
     page: int = Query(1, ge=1),
@@ -35,7 +35,7 @@ async def search_movies_async_route(
 ):
     return await search_movies_async(query, page, limit)
 
-@router.get("/by_genre", response_model=list[MovieListResponse])
+@router.get("/by_genre", response_model=List[MovieListResponse])
 def get_movies_by_genre(
     name: str = Query(..., min_length=2),
     page: int = Query(1, ge=1),
@@ -61,7 +61,7 @@ def unlike_movie(
 ):
     unlike_movie_by_imdb(current_user["email"], imdb_id)
 
-@router.get("/like", response_model=list[MovieListResponse])
+@router.get("/like", response_model=List[MovieListResponse])
 def get_liked_movies(current_user=Depends(get_current_user)):
     return get_movies_liked_by_user(current_user["email"])
 
@@ -73,10 +73,10 @@ def comment_movie(
 ):
     return create_comment(movie_id, current_user["email"], comment)
 
-@router.get("/comments", response_model=list[CommentResponse])
+@router.get("/comments", response_model=List[CommentResponse])
 def get_movie_comments(movie_id: str):
     return list_comments(movie_id)
 
-@router.get("/genres", response_model=list[str])
+@router.get("/genres", response_model=List[str])
 def get_genres():
     return list_all_genres()

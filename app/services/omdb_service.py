@@ -1,5 +1,6 @@
 import os
 from http import HTTPStatus
+from typing import List
 
 import httpx
 from dotenv import load_dotenv
@@ -19,7 +20,7 @@ def call_omdb(params: dict) -> dict | None:
     data = response.json()
     return data if data.get("Response") == "True" else None
 
-def search_movies_omdb(query: str, page: int = 1) -> list[dict]:
+def search_movies_omdb(query: str, page: int = 1) -> List[dict]:
     data = call_omdb({"s": query, "page": page})
     return data.get("Search", []) if data else []
 

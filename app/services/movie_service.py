@@ -1,3 +1,5 @@
+from typing import List
+
 from app.exceptions import MovieNotFoundError, UserNotFoundError, GenreNotFoundError
 from app.graph.queries.movie import (
     get_movie_by_title,
@@ -15,7 +17,7 @@ from app.schemas.movie import movie_node_to_list_response, MovieListResponse, mo
 from app.services.omdb_service import search_movies_omdb, fetch_movie_data_by_imdb
 
 
-def search_movies(query: str, page: int = 1, limit: int = 10) -> list[MovieListResponse]:
+def search_movies(query: str, page: int = 1, limit: int = 10) -> List[MovieListResponse]:
     skip = (page - 1) * limit
     local_nodes = search_movies_in_neo4j(query, skip, limit)
     responses = [movie_node_to_list_response(node) for node in local_nodes]
@@ -59,7 +61,7 @@ def search_movies(query: str, page: int = 1, limit: int = 10) -> list[MovieListR
 
     return responses
 
-def search_by_genre(genre: str, page: int, limit: int) -> list[MovieListResponse]:
+def search_by_genre(genre: str, page: int, limit: int) -> List[MovieListResponse]:
     skip = (page - 1) * limit
     if not genre in list_all_genres():
         raise GenreNotFoundError()
@@ -114,12 +116,12 @@ def like_movie_by_imdb(user_email: str, movie_id: str):
 def unlike_movie_by_imdb(user_email: str, movie_id: str):
     unlike_movie_by_imdb_id(user_email, movie_id)
 
-def get_movies_liked_by_user(user_email: str) -> list[MovieListResponse]:
+def get_movies_liked_by_user(user_email: str) -> List[MovieListResponse]:
     if not get_user_by_email(user_email):
         raise UserNotFoundError()
 
     nodes = get_liked_movies(user_email)
     return [movie_node_to_list_response(n) for n in nodes]
 
-def list_all_genres() -> list[str]:
+def list_all_genres() -> List[str]:
     return get_all_genres()
