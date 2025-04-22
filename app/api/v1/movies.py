@@ -1,3 +1,5 @@
+from typing import List
+
 from fastapi import APIRouter, Depends, Query
 
 from app.deps.auth import get_current_user
@@ -13,7 +15,7 @@ from app.services.movie_service import (
     get_movie_by_imdb,
     search_by_genre
 )
-
+from app.services.movie_service_async import search_movies_async
 
 router = APIRouter(prefix="/movies", tags=["Movies"])
 
@@ -24,6 +26,14 @@ def search_movies_route(
     limit: int = Query(10, ge=1, le=50),
 ):
     return search_movies(query=query, page=page, limit=limit)
+
+@router.get("/search-async", response_model=List[MovieListResponse])
+async def search_movies_async_route(
+    query: str,
+    page: int = 1,
+    limit: int = 10,
+):
+    return await search_movies_async(query, page, limit)
 
 @router.get("/by_genre", response_model=list[MovieListResponse])
 def get_movies_by_genre(

@@ -1,5 +1,7 @@
 from datetime import date
 from typing import Optional
+
+from neo4j.graph import Node
 from pydantic import BaseModel, EmailStr, Field, field_validator
 import neo4j.time
 
@@ -34,7 +36,7 @@ class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
 
-def user_node_to_response(node) -> UserResponse:
+def user_node_to_response(node: Node) -> UserResponse:
     return UserResponse(
         username=node["username"],
         email=node["email"],
