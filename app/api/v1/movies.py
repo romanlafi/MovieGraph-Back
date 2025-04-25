@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Body
 
 from app.deps.auth import get_current_user
 from app.schemas.comment import CommentCreate, CommentResponse
@@ -13,7 +13,8 @@ from app.services.movie_service import (
     get_movies_liked_by_user,
     list_all_genres,
     search_by_genre,
-    get_movie_by_tmdb
+    get_movie_by_tmdb,
+    get_related_movies
 )
 from app.services.movie_service_async import search_movies_async
 
@@ -65,10 +66,11 @@ def unlike_movie(
 def get_liked_movies(current_user=Depends(get_current_user)):
     return get_movies_liked_by_user(current_user["email"])
 
+
 @router.post("/comment")
 def comment_movie(
         movie_id: str = Query(...),
-        comment: CommentCreate = Depends(CommentCreate),
+        comment: CommentCreate = Body(...),
         current_user=Depends(get_current_user)
 ):
     return create_comment(movie_id, current_user["email"], comment)
@@ -80,3 +82,7 @@ def get_movie_comments(movie_id: str):
 @router.get("/genres", response_model=List[str])
 def get_genres():
     return list_all_genres()
+
+@router.get("/related", response_model=List[MovieListResponse])
+def related_movies(movie_id: str = Query(...)):
+    return get_related_movies(movie_id)

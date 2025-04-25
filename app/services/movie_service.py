@@ -11,7 +11,8 @@ from app.graph.queries.movie import (
     get_liked_movies,
     get_all_genres,
     search_movies_by_genre,
-    get_movie_by_tmdb_id
+    get_movie_by_tmdb_id,
+    get_related_movies_by_people
 )
 from app.graph.queries.person import create_relationship, create_person_with_tmdb
 from app.graph.queries.user import get_user_by_email
@@ -126,3 +127,7 @@ def get_movies_liked_by_user(user_email: str) -> List[MovieListResponse]:
 
 def list_all_genres() -> List[str]:
     return get_all_genres()
+
+def get_related_movies(tmdb_id: str) -> List[MovieListResponse]:
+    nodes = get_related_movies_by_people(tmdb_id)
+    return [movie_node_to_list_response(node) for node in nodes]
