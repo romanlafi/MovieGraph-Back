@@ -59,6 +59,24 @@ likes = {
     for user in users
 }
 
+COMMENTS = [
+    "¡Increíble película!",
+    "Me ha gustado bastante.",
+    "La fotografía es espectacular.",
+    "La actuación fue de 10.",
+    "El guión flojea un poco pero buena peli.",
+    "Una obra de arte, sin duda.",
+    "No me convenció el final.",
+    "Me sorprendió para bien.",
+    "Una película muy emotiva.",
+    "La banda sonora es brutal.",
+    "Esperaba más la verdad.",
+    "Gran dirección y grandes actuaciones.",
+    "Perfecta para verla más de una vez.",
+    "Un clásico moderno.",
+    "Muy recomendable para todos."
+]
+
 tokens = {}
 
 def register_and_login_users():
@@ -113,15 +131,52 @@ def search_and_like():
             if res.status_code == 200 and res.json():
                 print(f"Successfully searched movie {title}")
                 movie = res.json()[0]
-                imdb_id = movie["imdb_id"]
+                tmdb_id = movie["tmdb_id"]
                 httpx.post(
                     f"{BASE_URL}/movies/like",
-                    params={"imdb_id": imdb_id},
+                    params={"tmdb_id": tmdb_id},
                     headers={"Authorization": f"Bearer {token}"}
                 )
+
+def search_movies_only():
+    for title in movie_pool:
+        res = httpx.get(
+            f"{BASE_URL}/movies/search",
+            params={"query": title, "limit": 1}
+        )
+        if res.status_code == 200:
+            print(f"Searched and registered movie: {title}")
+        else:
+            print(f"Failed to search movie {title}: {res.text}")
+
+def insert_comments():
+    selected_users = random.sample(users, 15)  # Escogemos 15 usuarios distintos
+
+    for i, user in enumerate(selected_users):
+        token = tokens.get(user["email"])
+        if not token:
+            print(f"Skipping {user['email']} - not logged in.")
+            continue
+
+        comment_text = COMMENTS[i % len(COMMENTS)]
+        resp = httpx.post(
+            f"{BASE_URL}/movies/comment",
+            params={"movie_id": 577922},  # Aquí pasa movie_id como query param
+            headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
+            json={
+                "text": comment_text  # Solo el text dentro del body
+            }
+        )
+
+        if resp.status_code == 200:
+            print(f"Inserted comment from {user['email']}")
+        else:
+            print(f"Failed to insert comment from {user['email']}: {resp.status_code}")
 
 if __name__ == "__main__":
     register_and_login_users()
     # create_friendships()
-    search_and_like()
+    # search_and_like()
+    # search_movies_only()
+    insert_comments()
     print("\nPoblamiento vía API completado.")

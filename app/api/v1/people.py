@@ -1,13 +1,16 @@
-from fastapi import APIRouter, Query
+from typing import List
+
+from fastapi import APIRouter, Query, HTTPException
 
 from app.schemas.movie import MovieListResponse
-from app.schemas.person import PersonResponse
+from app.schemas.person import PersonResponse, PersonWithRoleResponse
 from app.services.person_service import (
     search_people,
     get_person_detail,
     get_person_filmography,
     get_filmography_as_actor,
-    get_filmography_as_director
+    get_filmography_as_director,
+    list_people_by_movie
 )
 
 router = APIRouter(prefix="/people", tags=["People"])
@@ -31,3 +34,10 @@ def acted_movies(person_id: str = Query(...)):
 @router.get("/directed", response_model=list[MovieListResponse])
 def directed_movies(person_id: str = Query(...)):
     return get_filmography_as_director(person_id)
+
+@router.get("/movies/people", response_model=List[PersonWithRoleResponse])
+def get_people_for_movie(tmdb_id: int = Query(..., description="TMDb ID of the movie")):
+    people = list_people_by_movie(tmdb_id)
+    if not people:
+        raise HTTPException(status_code=404, detail="No people found for this movie")
+    return people

@@ -12,8 +12,8 @@ from app.services.movie_service import (
     unlike_movie_by_imdb,
     get_movies_liked_by_user,
     list_all_genres,
-    get_movie_by_imdb,
-    search_by_genre
+    search_by_genre,
+    get_movie_by_tmdb
 )
 from app.services.movie_service_async import search_movies_async
 
@@ -44,8 +44,8 @@ def get_movies_by_genre(
     return search_by_genre(name, page, limit)
 
 @router.get("/", response_model=MovieResponse)
-def get_movie(imdb_id: str):
-    return get_movie_by_imdb(imdb_id)
+def get_movie(tmdb_id: str):
+    return get_movie_by_tmdb(tmdb_id)
 
 @router.post("/like", status_code=200)
 def like_movie(

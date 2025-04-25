@@ -4,30 +4,62 @@ from neo4j.graph import Node
 
 from app.graph.driver import get_driver
 
-def create_movie_node(**data) -> Optional[Node]:
+def create_movie_node(
+    tmdb_id: int,
+    title: str,
+    year: int = None,
+    genres: list[str] = None,
+    poster_url: str = None,
+    rated: str = None,
+    released: str = None,
+    runtime: str = None,
+    director: str = None,
+    box_office: str = None,
+    production: str = None,
+    website: str = None,
+    type: str = None,
+    plot: str = None,
+    rating: float = None,
+    trailer_url: str = None
+):
     query = """
-    CREATE (m:Movie {
-        title: $title,
-        year: $year,
-        genres: $genres,
-        imdb_id: $imdb_id,
-        poster_url: $poster_url,
-        rated: $rated,
-        released: $released,
-        imdb_rating: $imdb_rating,
-        runtime: $runtime,
-        director: $director,
-        box_office: $box_office,
-        production: $production,
-        website: $website,
-        type: $type,
-        plot: $plot
-    })
+    MERGE (m:Movie {tmdb_id: $tmdb_id})
+    SET m.title = $title,
+        m.year = $year,
+        m.genres = $genres,
+        m.poster_url = $poster_url,
+        m.rated = $rated,
+        m.released = $released,
+        m.runtime = $runtime,
+        m.director = $director,
+        m.box_office = $box_office,
+        m.production = $production,
+        m.website = $website,
+        m.type = $type,
+        m.plot = $plot,
+        m.rating = $rating,
+        m.trailer_url = $trailer_url
     RETURN m
     """
-    driver = get_driver()
-    with driver.session() as session:
-        result = session.run(query, {**data, "genres": data.get("genres", [])})
+    with get_driver().session() as session:
+        result = session.run(query, {
+            "tmdb_id": tmdb_id,
+            "title": title,
+            "year": year,
+            "genres": genres or [],
+            "poster_url": poster_url,
+            "rated": rated,
+            "released": released,
+            "runtime": runtime,
+            "director": director,
+            "box_office": box_office,
+            "production": production,
+            "website": website,
+            "type": type,
+            "plot": plot,
+            "rating": rating,
+            "trailer_url": trailer_url
+        })
         record = result.single()
         return record["m"] if record else None
 
@@ -65,14 +97,14 @@ def search_movies_by_genre(
         result = session.run(query, {"genre": genre, "skip": skip, "limit": limit})
         return [record["m"] for record in result]
 
-def get_movie_by_imdb_id(imdb_id: str) -> Optional[Node]:
+def get_movie_by_tmdb_id(tmdb_id: str) -> Optional[Node]:
     query = """
-    MATCH (m:Movie {imdb_id: $imdb_id})
+    MATCH (m:Movie {tmdb_id: $tmdb_id})
     RETURN m
     """
     driver = get_driver()
     with driver.session() as session:
-        result = session.run(query, {"imdb_id": imdb_id})
+        result = session.run(query, {"tmdb_id": int(tmdb_id)})
         record = result.single()
         return record["m"] if record else None
 

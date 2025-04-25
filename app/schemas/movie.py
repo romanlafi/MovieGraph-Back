@@ -5,9 +5,9 @@ from typing import Optional, List
 
 class MovieBase(BaseModel):
     title: str
+    tmdb_id: int
     year: Optional[int] = None
     genres: Optional[List[str]] = []
-    imdb_id: Optional[str] = None
     poster_url: Optional[str] = None
     rated: Optional[str] = None
     released: Optional[str] = None
@@ -18,6 +18,8 @@ class MovieBase(BaseModel):
     website: Optional[str] = None
     type: Optional[str] = None
     plot: Optional[str] = None
+    rating: Optional[float] = None
+    trailer_url: Optional[str] = None
 
 class MovieCreate(MovieBase):
     pass
@@ -26,21 +28,21 @@ class MovieResponse(MovieBase):
     id: str
 
 class MovieListResponse(BaseModel):
-    imdb_id: str
+    tmdb_id: int
     title: str
     poster_url: Optional[str] = None
     year: Optional[int] = None
     director: Optional[str] = None
-    imdb_rating: Optional[float] = None
+    rating: Optional[float] = None
     type: Optional[str] = None
 
 def movie_node_to_response(node: Node) -> MovieResponse:
     return MovieResponse(
         id=str(node.id),
+        tmdb_id=node.get("tmdb_id"),
         title=node.get("title"),
         year=node.get("year"),
         genres=node.get("genres", []),
-        imdb_id=node.get("imdb_id"),
         poster_url=node.get("poster_url"),
         rated=node.get("rated"),
         released=node.get("released"),
@@ -50,16 +52,19 @@ def movie_node_to_response(node: Node) -> MovieResponse:
         production=node.get("production"),
         website=node.get("website"),
         type=node.get("type"),
-        plot=node.get("plot")
+        plot=node.get("plot"),
+        rating=node.get("rating"),
+        trailer_url=node.get("trailer_url")
     )
+
 
 def movie_node_to_list_response(node: Node) -> MovieListResponse:
     return MovieListResponse(
-        imdb_id=node.get("imdb_id"),
-        title=node["title"],
+        tmdb_id=node.get("tmdb_id"),
+        title=node.get("title"),
         poster_url=node.get("poster_url"),
         year=node.get("year"),
         director=node.get("director"),
-        imdb_rating=node.get("imdb_rating"),
+        rating=node.get("rating"),
         type=node.get("type")
     )

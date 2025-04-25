@@ -3,7 +3,7 @@ import httpx
 from typing import List, Optional, Set
 from app.graph.queries.movie import (
     search_movies_in_neo4j,
-    get_movie_by_imdb_id,
+    get_movie_by_tmdb_id,
     create_movie_node
 )
 from app.schemas.movie import MovieListResponse, movie_node_to_list_response
@@ -38,7 +38,7 @@ async def fetch_movie_data_by_imdb_async(imdb_id: str) -> Optional[dict]:
     return None
 
 async def register_movie_async(data: dict):
-    if data and data.get("imdb_id") and not get_movie_by_imdb_id(data["imdb_id"]):
+    if data and data.get("imdb_id") and not get_movie_by_tmdb_id(data["imdb_id"]):
         if data.get("type") in ("movie", "series") and data.get("url"):
             create_movie_node(data)
 
@@ -71,7 +71,7 @@ async def search_movies_async(query: str, page: int = 1, limit: int = 10) -> Lis
         if not title or not imdb_id or title.lower() in seen_titles:
             continue
 
-        if get_movie_by_imdb_id(imdb_id):
+        if get_movie_by_tmdb_id(imdb_id):
             continue
 
         task = fetch_movie_data_by_imdb_async(imdb_id)
