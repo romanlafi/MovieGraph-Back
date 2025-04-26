@@ -160,18 +160,21 @@ def insert_comments():
 
         comment_text = COMMENTS[i % len(COMMENTS)]
         resp = httpx.post(
-            f"{BASE_URL}/movies/comment",
-            params={"movie_id": 577922},  # Aquí pasa movie_id como query param
-            headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
-            json={
-                "text": comment_text  # Solo el text dentro del body
+            f"{BASE_URL}/comments/",
+            headers={
+                "Authorization": f"Bearer {token}",
+                "Content-Type": "application/json"
+            },
+            json={  # Ahora usamos JSON, no data
+                "tmdb_id": 577922,
+                "text": comment_text
             }
         )
 
         if resp.status_code == 200:
             print(f"Inserted comment from {user['email']}")
         else:
-            print(f"Failed to insert comment from {user['email']}: {resp.status_code}")
+            print(f"Failed to insert comment from {user['email']}: {resp.status_code} - {resp.text}")
 
 if __name__ == "__main__":
     register_and_login_users()

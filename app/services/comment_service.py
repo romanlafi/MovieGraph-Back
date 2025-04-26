@@ -1,18 +1,12 @@
-from app.exceptions import UserNotFoundError, MovieNotFoundError
-from app.graph.queries.comment import add_comment, get_comments
-from app.graph.queries.movie import get_movie_by_tmdb_id
-from app.graph.queries.user import get_user_by_email
-from app.schemas.comment import CommentCreate
+from typing import List
+
+from app.graph.queries.comment import get_comments_query, create_comment_query
+from app.schemas.comment import CommentResponse
 
 
-def create_comment(movie_id: str, user_email: str, comment: CommentCreate):
-    if not get_user_by_email(user_email):
-        raise UserNotFoundError()
-    if not get_movie_by_tmdb_id(movie_id):
-        raise MovieNotFoundError()
-    add_comment(movie_id, user_email, comment.text)
+def create_comment(movie_tmdb_id: int, user_email: str, text: str):
+    create_comment_query(movie_tmdb_id, user_email, text)
 
-def list_comments(movie_id: str):
-    if not get_movie_by_tmdb_id(movie_id):
-        raise MovieNotFoundError()
-    return get_comments(movie_id)
+def list_comments(movie_tmdb_id: int) -> List[CommentResponse]:
+    records = get_comments_query(movie_tmdb_id)
+    return [CommentResponse(**record) for record in records]

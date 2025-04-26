@@ -156,15 +156,31 @@ def get_all_genres() -> List[str]:
         result = session.run(query)
         return [record["genre"] for record in result]
 
-def get_related_movies_by_people(tmdb_id: str) -> list:
+def get_related_movies_by_people_and_genres(tmdb_id: str) -> List[Node]:
     query = """
-    MATCH (m:Movie {tmdb_id: $tmdb_id})<-[:ACTED_IN|DIRECTED|WROTE]-(p:Person)
-    MATCH (p)-[:ACTED_IN|DIRECTED|WROTE]->(related:Movie)
-    WHERE related.tmdb_id <> $tmdb_id
-    RETURN DISTINCT related
-    LIMIT 10
-    """
+        MATCH (m:Movie {tmdb_id: $tmdb_id})
+
+        OPTIONAL MATCH (p:Person)-[:ACTED_IN|DIRECTED|WROTE]->(m)
+        WITH m, COLLECT(p) AS people
+
+        UNWIND people AS person
+        MATCH (person)-[:ACTED_IN|DIRECTED|WROTE]->(related_by_people:Movie)
+        WHERE related_by_people.tmdb_id <> $tmdb_id
+
+        WITH m, COLLECT(DISTINCT related_by_people) AS people_movies
+
+        UNWIND m.genres AS genre
+        MATCH (related_by_genre:Movie)
+        WHERE genre IN related_by_genre.genres AND related_by_genre.tmdb_id <> $tmdb_id
+
+        WITH people_movies, COLLECT(DISTINCT related_by_genre) AS genre_movies
+
+        WITH people_movies + genre_movies AS all_movies
+        UNWIND all_movies AS movie
+        RETURN DISTINCT movie
+        LIMIT 20
+        """
     driver = get_driver()
     with driver.session() as session:
         result = session.run(query, {"tmdb_id": int(tmdb_id)})
-        return [record["related"] for record in result]
+        return [record["movie"] for record in result]

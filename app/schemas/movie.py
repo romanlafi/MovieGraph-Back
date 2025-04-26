@@ -31,8 +31,8 @@ class MovieListResponse(BaseModel):
     tmdb_id: int
     title: str
     poster_url: Optional[str] = None
-    year: Optional[int] = None
-    director: Optional[str] = None
+    # year: Optional[int] = None
+    #director: Optional[str] = None
     rating: Optional[float] = None
     type: Optional[str] = None
 
@@ -63,8 +63,8 @@ def movie_node_to_list_response(node: Node) -> MovieListResponse:
         tmdb_id=node.get("tmdb_id"),
         title=node.get("title"),
         poster_url=node.get("poster_url"),
-        year=node.get("year"),
-        director=node.get("director"),
+        # year=node.get("year"),
+        # director=node.get("director"),
         rating=node.get("rating"),
         type=node.get("type")
     )

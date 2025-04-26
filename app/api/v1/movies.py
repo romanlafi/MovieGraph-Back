@@ -66,19 +66,6 @@ def unlike_movie(
 def get_liked_movies(current_user=Depends(get_current_user)):
     return get_movies_liked_by_user(current_user["email"])
 
-
-@router.post("/comment")
-def comment_movie(
-        movie_id: str = Query(...),
-        comment: CommentCreate = Body(...),
-        current_user=Depends(get_current_user)
-):
-    return create_comment(movie_id, current_user["email"], comment)
-
-@router.get("/comments", response_model=List[CommentResponse])
-def get_movie_comments(movie_id: str):
-    return list_comments(movie_id)
-
 @router.get("/genres", response_model=List[str])
 def get_genres():
     return list_all_genres()
